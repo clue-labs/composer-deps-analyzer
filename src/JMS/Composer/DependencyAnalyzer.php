@@ -31,12 +31,13 @@ class DependencyAnalyzer
 {
     /**
      * @param string $dir
+     * @param bool $noDev
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      * @return \JMS\Composer\Graph\DependencyGraph
      */
-    public function analyze($dir)
+    public function analyze($dir, $noDev = false)
     {
         if ( ! is_dir($dir)) {
             throw new \InvalidArgumentException(sprintf('The directory "%s" does not exist.', $dir));
@@ -56,11 +57,12 @@ class DependencyAnalyzer
         return $this->analyzeComposerData(
             file_get_contents($dir.'/composer.json'),
             is_file($dir.'/composer.lock') ? file_get_contents($dir.'/composer.lock') : null,
-            $dir
+            $dir,
+            $noDev
         );
     }
 
-    public function analyzeComposerData($composerJsonData, $composerLockData = null, $dir = null)
+    public function analyzeComposerData($composerJsonData, $composerLockData = null, $dir = null, $noDev = false)
     {
         $rootPackageData = $this->parseJson($composerJsonData);
         if ( ! isset($rootPackageData['name'])) {
@@ -85,7 +87,7 @@ class DependencyAnalyzer
                 }
             }
 
-            if (isset($rootPackageData['require-dev'])) {
+            if (!$noDev && isset($rootPackageData['require-dev'])) {
                 foreach ($rootPackageData['require-dev'] as $name => $versionConstraint) {
                     $this->connect($graph, $rootPackageData['name'], $name, $versionConstraint);
                 }
@@ -106,7 +108,7 @@ class DependencyAnalyzer
         }
 
         // Add development packages.
-        if (isset($lockData['packages-dev'])) {
+        if (!$noDev && isset($lockData['packages-dev'])) {
             $this->addPackages($graph, $lockData['packages-dev'], $vendorDir);
         }
 
@@ -120,7 +122,7 @@ class DependencyAnalyzer
                 }
             }
 
-            if (isset($packageData['require-dev'])) {
+            if (!$noDev && isset($packageData['require-dev'])) {
                 foreach ($packageData['require-dev'] as $name => $version) {
                     $this->connect($graph, $packageData['name'], $name, $version);
                 }
