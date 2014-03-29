@@ -70,6 +70,12 @@ class DependencyEdge
     }
 
     /**
+     * Checks whether the source package lists the destination package in require-dev
+     *
+     * Attention has to be paid to source packages that list the dependency in
+     * both "require-dev" and "require". In that case, only a single edge will
+     * be created that is considered to be a dev dependency.
+     *
      * @return bool
      */
     public function isDevDependency()
