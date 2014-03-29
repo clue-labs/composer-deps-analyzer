@@ -77,9 +77,24 @@ class DependencyEdge
      * be created that is considered to be a dev dependency.
      *
      * @return bool
+     * @see self::isOnlyDevDependency()
      */
     public function isDevDependency()
     {
         return $this->sourcePackage->hasDataPackageKey('require-dev', $this->destPackage->getName());
+    }
+
+    /**
+     * Checks whether the source package lists the destination package only in require-dev
+     *
+     * If the source package lists the destination package in both "required-dev"
+     * and "require", this edge is not considered to be only a dev dependency.
+     *
+     * @return bool
+     * @see self::isDevDependency()
+     */
+    public function isOnlyDevDependency()
+    {
+        return ($this->isDevDependency() && !$this->sourcePackage->hasDataPackageKey('require', $this->destPackage->getName()));
     }
 }

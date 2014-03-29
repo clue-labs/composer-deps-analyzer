@@ -20,6 +20,7 @@ class DependencyEdgeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('*', $edge->getVersionConstraint());
 
         $this->assertFalse($edge->isDevDependency());
+        $this->assertFalse($edge->isOnlyDevDependency());
     }
 
     public function testOnlyDev()
@@ -34,6 +35,7 @@ class DependencyEdgeTest extends \PHPUnit_Framework_TestCase
         $edge = new DependencyEdge($source, $destination, '*');
 
         $this->assertTrue($edge->isDevDependency());
+        $this->assertTrue($edge->isOnlyDevDependency());
     }
 
     public function testAlsoDev()
@@ -51,5 +53,6 @@ class DependencyEdgeTest extends \PHPUnit_Framework_TestCase
         $edge = new DependencyEdge($source, $destination, '*');
 
         $this->assertTrue($edge->isDevDependency());
+        $this->assertFalse($edge->isOnlyDevDependency());
     }
 }
